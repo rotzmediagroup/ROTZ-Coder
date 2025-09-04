@@ -3,7 +3,6 @@ version: '3.8'
 services:
   app:
     build: .
-    image: rotz-coder:latest
     container_name: rotz-coder-app
     restart: unless-stopped
     ports:
