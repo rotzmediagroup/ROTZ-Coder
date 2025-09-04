@@ -14,7 +14,6 @@ venv/
 *.env*
 .env_example
 
-
 # Build / Distribution
 dist/
 build/
@@ -52,15 +51,49 @@ examples/input/
 examples/output/
 deepcode-mcp/agent_folders
 
+# Database files (ROTZ Coder enhancement)
+*.db
+deepcode.db
+*.sqlite
+*.sqlite3
+
+# Secrets and Configuration (ROTZ Coder enhancement)
+.streamlit/secrets.toml
+secrets.toml
+*.secret
+*.key
+config/secret_*
+
+# User Data and Sessions (ROTZ Coder enhancement)
+user_data/
+sessions/
+uploads/
+temp_files/
+
+# API Keys and Authentication (ROTZ Coder enhancement)
+api_keys/
+.env.local
+.env.production
+.env.staging
+
+# Streamlit specific (ROTZ Coder enhancement)
+.streamlit/secrets.toml
+
 # Miscellaneous
 .DS_Store
 TODO.md
 ignore_this.txt
 *.ignore.*
 
-# unit-test files
+# unit-test files (keep test_installation.py)
 test_*
+!test_installation.py
 run_indexer_with_filtering.py
 
 # Cline files
 memory-bank/
+
+# ROTZ Coder specific
+rotz_coder.log
+backup/
+migrations/versions/*.pyc
