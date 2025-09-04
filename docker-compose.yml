@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: rotz-coder:latest
+    container_name: rotz-coder-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8501}:8501"
+    environment:
+      # Database Configuration
+      - DATABASE_URL=${DATABASE_URL:-postgresql://rotz:rotz123@db:5432/rotz_coder}
+      
+      # Security Keys (Required - Generate secure values)
+      - JWT_SECRET=${JWT_SECRET:?JWT_SECRET is required}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY:?ENCRYPTION_KEY is required}
+      
+      # Streamlit Configuration
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ENABLE_CORS=${ENABLE_CORS:-false}
+      - STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION=true
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+      
+      # Application Settings
+      - APP_ENV=${APP_ENV:-production}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SESSION_TIMEOUT=${SESSION_TIMEOUT:-3600}
+      
+      # Email Configuration (Optional)
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - SMTP_FROM=${SMTP_FROM:-noreply@rotz.host}
+      
+      # Super Admin Configuration
+      - SUPER_ADMIN_EMAIL=${SUPER_ADMIN_EMAIL:-jerome@rotz.host}
+      - SUPER_ADMIN_PASSWORD=${SUPER_ADMIN_PASSWORD:-ChangeMe123!}
+      
+      # Optional API Keys (for admin defaults)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - QWEN_API_KEY=${QWEN_API_KEY:-}
+      - GROK_API_KEY=${GROK_API_KEY:-}
+      - BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY:-}
+      
+    volumes:
+      - app_data:/app/data
+      - app_uploads:/app/uploads
+      - app_logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - rotz_network
+    labels:
+      # Coolify labels for proxy configuration
+      - coolify.managed=true
+      - coolify.proxy=true
+      - coolify.domain=${DOMAIN:-}
+      - coolify.ssl=${SSL_ENABLED:-true}
+      - coolify.healthcheck.enabled=true
+      - coolify.healthcheck.path=/_stcore/health
+
+  db:
+    image: postgres:15-alpine
+    container_name: rotz-coder-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=rotz_coder
+      - POSTGRES_USER=rotz
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-rotz123}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - rotz_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rotz -d rotz_coder"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - coolify.managed=true
+
+  # Optional: Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: rotz-coder-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis123}
+    volumes:
+      - redis_data:/data
+    networks:
+      - rotz_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - coolify.managed=true
+
+networks:
+  rotz_network:
+    driver: bridge
+
+volumes:
+  app_data:
+    driver: local
+  app_uploads:
+    driver: local
+  app_logs:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

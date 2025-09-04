@@ -1,0 +1,110 @@
+# Git files
+.git
+.gitignore
+.github
+
+# Python files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*
+!.env.example
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+deepcode.db
+
+# Logs
+*.log
+logs/
+
+# Test files
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+tests/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Node modules (if any)
+node_modules/
+
+# Uploads and user data (will be mounted as volumes)
+uploads/
+data/
+user_data/
+
+# Backup files
+*.bak
+*.backup
+backup/
+
+# Cache files
+.cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets (should never be in image)
+secrets/
+*.key
+*.pem
+*.crt
+.streamlit/secrets.toml
+
+# Development files
+requirements-dev.txt
+pytest.ini
+Makefile
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Memory bank (Cline)
+memory-bank/

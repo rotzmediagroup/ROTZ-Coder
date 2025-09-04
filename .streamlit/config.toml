@@ -1,0 +1,76 @@
+# Streamlit Configuration for Production
+
+[server]
+# Server settings
+headless = true
+address = "0.0.0.0"
+port = 8501
+baseUrlPath = ""
+enableCORS = false
+enableXsrfProtection = true
+maxUploadSize = 100
+maxMessageSize = 200
+enableWebsocketCompression = true
+
+# Enable static file serving
+enableStaticServing = true
+folderWatchBlacklist = []
+
+# Websocket settings
+websocketPingInterval = 0
+websocketMaxMessageSize = 200
+
+[browser]
+# Browser settings
+gatherUsageStats = false
+serverAddress = "0.0.0.0"
+serverPort = 8501
+
+[ui]
+# UI settings
+hideTopBar = false
+hideSidebarNav = false
+
+[theme]
+# Theme settings for professional appearance
+primaryColor = "#FF6B6B"          # ROTZ brand color
+backgroundColor = "#FFFFFF"       # Clean white background
+secondaryBackgroundColor = "#F0F2F6"  # Light gray for sections
+textColor = "#262730"             # Dark text for readability
+font = "sans serif"
+
+[runner]
+# Runner settings for production
+magicEnabled = true
+installTracer = false
+fixMatplotlib = true
+postScriptGC = true
+fastReruns = true
+
+[logger]
+# Logging configuration
+level = "INFO"
+messageFormat = "%(asctime)s %(levelname)s %(name)s: %(message)s"
+
+[client]
+# Client settings
+caching = true
+displayEnabled = true
+showErrorDetails = false  # Hide error details in production
+
+[mapbox]
+# Mapbox configuration (if needed)
+token = ""
+
+[deprecation]
+# Show deprecation warnings
+showfileUploaderEncoding = false
+showImageFormat = false
+showPyplotGlobalUse = false
+
+[global]
+# Global settings
+developmentMode = false
+disableWatchdogWarning = true
+showWarningOnDirectExecution = false
+dataFrameSerialization = "arrow"
