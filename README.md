@@ -18,7 +18,7 @@ ROTZ Coder is an enhanced version of DeepCode, transformed into a comprehensive 
 - **🎨 Modern UI**: Clean, responsive design inspired by modern web apps
 - **👑 Admin Management**: Complete user and system administration
 - **🔒 Secure Storage**: Encrypted API key storage per user
-- **📊 Analytics**: Usage tracking and system monitoring
+- **📊 Advanced Analytics**: Real-time usage tracking, performance monitoring, and insights dashboard
 
 ## ✨ Key Features
 
@@ -51,6 +51,15 @@ ROTZ Coder is an enhanced version of DeepCode, transformed into a comprehensive 
 - **LLM Configuration**: Assign models to specific tasks
 - **System Analytics**: Usage statistics and performance metrics
 - **Provider Management**: Configure and monitor AI providers
+
+### 📊 Advanced Analytics Dashboard
+- **Real-time Monitoring**: Live usage tracking and system health metrics
+- **User Behavior Analysis**: Activity patterns, feature usage, and engagement insights
+- **API Usage & Costs**: Token consumption, cost analysis across all LLM providers
+- **Performance Metrics**: Page load times, system performance, and optimization insights
+- **Error Tracking**: Comprehensive error logging with severity categorization
+- **Interactive Charts**: Plotly-powered visualizations with time-range filtering
+- **Export Capabilities**: Data export for further analysis and reporting
 
 ## 🏃‍♂️ Quick Start
 
@@ -101,7 +110,8 @@ ROTZ-Coder/
 │   ├── 4_⚙️_Admin.py           # Admin panel
 │   ├── 5_📊_Results.py         # Research results
 │   ├── 6_🔑_Login.py           # Authentication
-│   └── 7_📝_Register.py        # User registration
+│   ├── 7_📝_Register.py        # User registration
+│   └── 8_📊_Analytics.py       # Advanced analytics dashboard
 ├── 🔐 auth/                     # Authentication system
 │   ├── authentication.py       # User auth, TOTP, JWT
 │   ├── encryption.py          # API key encryption
@@ -118,15 +128,24 @@ ROTZ-Coder/
 │   ├── grok_provider.py        # xAI Grok integration
 │   ├── provider_factory.py     # Provider factory pattern
 │   └── __init__.py
+├── 📊 analytics/                # Analytics & monitoring system
+│   ├── collectors.py           # Data collection utilities
+│   ├── dashboard.py            # Analytics dashboard functions
+│   └── __init__.py
 ├── 🛠️ utils/                    # Utilities & helpers
 │   ├── database.py             # Database utilities
 │   └── ...
 ├── 🎨 ui/                       # Original UI (enhanced)
+├── 🧪 tests/                    # Test suite
+│   ├── test_analytics.py       # Analytics tests
+│   └── __init__.py
 ├── 🔧 .streamlit/               # Configuration
 │   └── secrets.toml            # App secrets (template)
 ├── 📚 SETUP.md                  # Detailed setup guide
 ├── 🧪 test_installation.py     # Installation verification
-└── 📋 requirements.txt         # Python dependencies
+├── 📋 requirements.txt         # Python dependencies
+├── 📋 requirements-dev.txt     # Development dependencies
+└── ⚙️ pytest.ini               # Test configuration
 ```
 
 ## 🛠️ Configuration
@@ -199,6 +218,23 @@ rate limiting, and PostgreSQL integration using FastAPI"
 # - Optimize performance (GPT-4)
 ```
 
+### Analytics & Monitoring
+```python
+# Access the Analytics Dashboard (Admin only):
+# 1. Navigate to 📊 Analytics page
+# 2. View real-time usage metrics and system health
+# 3. Analyze user behavior and API costs
+# 4. Monitor performance and identify optimization opportunities
+# 5. Track errors and system stability
+
+# Analytics automatically tracks:
+# - User activities and engagement patterns
+# - API usage across all LLM providers
+# - System performance and response times
+# - Error rates and categorization
+# - Cost analysis and token consumption
+```
+
 ## 🔒 Security Features
 
 - **Password Security**: bcrypt hashing with salt
@@ -208,6 +244,46 @@ rate limiting, and PostgreSQL integration using FastAPI"
 - **Role-Based Access**: Granular permission system
 - **Input Validation**: All inputs sanitized and validated
 - **HTTPS Ready**: SSL/TLS support for production
+
+## 📈 Analytics Features (v2.1)
+
+### Real-time Dashboard
+The Advanced Analytics Dashboard provides comprehensive insights into system usage and performance:
+
+#### 👥 User Analytics
+- **Activity Tracking**: Login patterns, feature usage, session duration
+- **Engagement Metrics**: Most active users, popular features, retention rates
+- **Behavior Analysis**: User flow analysis and interaction patterns
+
+#### 🔌 API Usage Monitoring
+- **Provider Performance**: Response times and success rates across all LLM providers
+- **Cost Analysis**: Token consumption and estimated costs per provider/model
+- **Usage Patterns**: Daily/weekly usage trends and peak usage times
+- **Model Comparison**: Performance and cost comparison between different AI models
+
+#### ⚡ Performance Metrics
+- **System Health**: CPU, memory usage, and system load monitoring
+- **Response Times**: Page load times and API response analytics
+- **Database Performance**: Query execution times and optimization insights
+- **Error Tracking**: Real-time error monitoring with severity categorization
+
+#### 📊 Interactive Visualizations
+- **Time-series Charts**: Track metrics over customizable time periods (7-90 days)
+- **Bar Charts**: Compare usage across providers, models, and users
+- **Pie Charts**: Visualize distribution of activities, costs, and errors
+- **Real-time Updates**: Live data refresh with 30-second auto-refresh option
+
+#### 🔐 Security & Access Control
+- **Admin-only Access**: Analytics restricted to administrators and super admins
+- **User Privacy**: Optional user-specific filtering for detailed analysis
+- **Data Export**: Export analytics data for further analysis (coming soon)
+- **Audit Trail**: Track who accesses analytics and when
+
+### Technical Implementation
+- **Database Models**: 5 new tables for comprehensive analytics tracking
+- **Collection System**: Automatic, non-intrusive data collection
+- **Performance**: Indexed queries for fast analytics even with large datasets
+- **Scalability**: Designed to handle high-volume production environments
 
 ## 📊 System Requirements
 
@@ -265,11 +341,11 @@ source venv/bin/activate  # or `venv\Scripts\activate` on Windows
 
 # Install development dependencies
 pip install -r requirements.txt
-pip install -r requirements-dev.txt  # Coming soon
+pip install -r requirements-dev.txt
 
 # Run tests
 python test_installation.py
-pytest tests/  # Coming soon
+pytest tests/
 ```
 
 ### Adding New LLM Providers
@@ -300,23 +376,34 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🗺️ Roadmap
 
-### v2.1 (Next Release)
-- [ ] Advanced analytics dashboard
+### ✅ v2.1 (Current Release)
+- [x] **Advanced Analytics Dashboard**: Real-time monitoring, user behavior analysis, API cost tracking
+- [x] **Enhanced Database Models**: Comprehensive analytics and monitoring tables
+- [x] **Interactive Visualizations**: Plotly-powered charts with time-range filtering
+- [x] **Performance Tracking**: System metrics, error logging, and optimization insights
+- [x] **Test Framework**: Complete test suite with pytest and coverage reporting
 - [ ] Email notifications system
-- [ ] Export research results to various formats
+- [ ] Export research results to various formats  
 - [ ] Batch processing capabilities
 
-### v2.2 (Future)
-- [ ] API access for programmatic use
-- [ ] Team collaboration features
-- [ ] Advanced security audit logging
-- [ ] Custom AI model fine-tuning
+### v2.2 (Next Release)
+- [ ] **Notification System**: Email alerts for system events and user activities
+- [ ] **Advanced Export**: PDF, Excel, JSON export capabilities for research results
+- [ ] **Batch Processing**: Queue system for handling multiple research tasks
+- [ ] **API Endpoints**: RESTful API for programmatic access
+- [ ] **Enhanced Security**: Advanced audit logging and session management
 
-### v3.0 (Long-term)
-- [ ] Plugin architecture for custom tools
-- [ ] Integration with popular IDEs
-- [ ] Advanced workflow automation
-- [ ] Enterprise SSO integration
+### v2.3 (Future)
+- [ ] **Team Collaboration**: Shared workspaces and collaborative research
+- [ ] **Custom AI Models**: Fine-tuning capabilities for specialized tasks
+- [ ] **Advanced Workflows**: Automated research pipelines and templates
+- [ ] **Integration Hub**: Connect with popular development tools and platforms
+
+### v3.0 (Long-term Vision)
+- [ ] **Plugin Architecture**: Extensible system for custom tools and integrations
+- [ ] **IDE Extensions**: Native support for VS Code, PyCharm, and other IDEs
+- [ ] **Enterprise Features**: SSO integration, advanced user management, compliance tools
+- [ ] **AI Orchestration**: Advanced multi-model coordination and optimization
 
 ---
 
