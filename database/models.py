@@ -2,7 +2,7 @@
 Database models for DeepCode user management and LLM configuration
 """
 
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, ForeignKey, JSON, Float
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, ForeignKey, JSON, Float, Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from datetime import datetime
@@ -28,6 +28,8 @@ class User(Base):
     sessions = relationship("UserSession", back_populates="user", cascade="all, delete-orphan")
     research_tasks = relationship("ResearchTask", back_populates="user", cascade="all, delete-orphan")
     llm_configurations = relationship("LLMConfiguration", back_populates="created_by_user")
+    user_activities = relationship("UserActivity", back_populates="user", cascade="all, delete-orphan")
+    api_usage_logs = relationship("ApiUsageLog", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<User(email='{self.email}', is_admin={self.is_admin})>"
@@ -109,6 +111,147 @@ class ResearchTask(Base):
     
     def __repr__(self):
         return f"<ResearchTask(id={self.id}, user_id={self.user_id}, status='{self.status}')>"
+
+
+class UserActivity(Base):
+    """Track user actions and behavior for analytics"""
+    __tablename__ = 'user_activities'
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
+    activity_type = Column(String(50), nullable=False, index=True)  # login, logout, research_task, api_key_update, etc.
+    page = Column(String(100))  # Which page/section the activity occurred on
+    details = Column(JSON)  # Additional activity details
+    ip_address = Column(String(45))  # Support IPv6
+    user_agent = Column(Text)
+    session_id = Column(String(255), index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="user_activities")
+    
+    # Indexes for performance
+    __table_args__ = (
+        Index('idx_user_activity_time', 'user_id', 'created_at'),
+        Index('idx_activity_type_time', 'activity_type', 'created_at'),
+    )
+    
+    def __repr__(self):
+        return f"<UserActivity(user_id={self.user_id}, type='{self.activity_type}', time={self.created_at})>"
+
+
+class ApiUsageLog(Base):
+    """Track API usage and performance metrics"""
+    __tablename__ = 'api_usage_logs'
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True)
+    provider = Column(String(50), nullable=False, index=True)  # openai, anthropic, etc.
+    model_name = Column(String(100), nullable=False, index=True)
+    task_type = Column(String(100), index=True)  # code_generation, document_analysis, etc.
+    request_type = Column(String(50))  # completion, chat, embedding, etc.
+    input_tokens = Column(Integer)
+    output_tokens = Column(Integer)
+    total_tokens = Column(Integer)
+    response_time_ms = Column(Integer)  # Response time in milliseconds
+    success = Column(Boolean, default=True, index=True)
+    error_message = Column(Text)
+    cost_estimate = Column(Float)  # Estimated cost in USD
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="api_usage_logs")
+    
+    # Indexes for performance
+    __table_args__ = (
+        Index('idx_user_usage_time', 'user_id', 'created_at'),
+        Index('idx_provider_usage_time', 'provider', 'created_at'),
+        Index('idx_success_time', 'success', 'created_at'),
+    )
+    
+    def __repr__(self):
+        return f"<ApiUsageLog(user_id={self.user_id}, provider='{self.provider}', tokens={self.total_tokens})>"
+
+
+class SystemMetrics(Base):
+    """Track system-wide performance and health metrics"""
+    __tablename__ = 'system_metrics'
+    
+    id = Column(Integer, primary_key=True)
+    metric_type = Column(String(50), nullable=False, index=True)  # cpu_usage, memory_usage, active_users, etc.
+    metric_name = Column(String(100), nullable=False, index=True)
+    value = Column(Float, nullable=False)
+    unit = Column(String(20))  # percent, bytes, count, etc.
+    tags = Column(JSON)  # Additional metadata as key-value pairs
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    
+    # Indexes for performance
+    __table_args__ = (
+        Index('idx_metric_type_time', 'metric_type', 'created_at'),
+        Index('idx_metric_name_time', 'metric_name', 'created_at'),
+    )
+    
+    def __repr__(self):
+        return f"<SystemMetrics(type='{self.metric_type}', name='{self.metric_name}', value={self.value})>"
+
+
+class ErrorLog(Base):
+    """Track application errors and exceptions"""
+    __tablename__ = 'error_logs'
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=True, index=True)  # Can be null for system errors
+    error_type = Column(String(100), nullable=False, index=True)
+    error_message = Column(Text, nullable=False)
+    stack_trace = Column(Text)
+    request_path = Column(String(500))
+    request_method = Column(String(10))
+    user_agent = Column(Text)
+    ip_address = Column(String(45))
+    severity = Column(String(20), default='error', index=True)  # debug, info, warning, error, critical
+    resolved = Column(Boolean, default=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    
+    # Relationships
+    user = relationship("User")  # Optional relationship
+    
+    # Indexes for performance
+    __table_args__ = (
+        Index('idx_error_type_time', 'error_type', 'created_at'),
+        Index('idx_severity_time', 'severity', 'created_at'),
+        Index('idx_resolved_time', 'resolved', 'created_at'),
+    )
+    
+    def __repr__(self):
+        return f"<ErrorLog(type='{self.error_type}', severity='{self.severity}', time={self.created_at})>"
+
+
+class PerformanceMetrics(Base):
+    """Track page load times and application performance"""
+    __tablename__ = 'performance_metrics'
+    
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=True, index=True)
+    page = Column(String(100), nullable=False, index=True)
+    load_time_ms = Column(Integer, nullable=False)  # Page load time in milliseconds
+    memory_usage_mb = Column(Float)  # Memory usage in MB
+    cpu_usage_percent = Column(Float)  # CPU usage percentage
+    database_queries = Column(Integer)  # Number of database queries
+    database_time_ms = Column(Integer)  # Total database query time
+    user_agent = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    
+    # Relationships
+    user = relationship("User")  # Optional relationship
+    
+    # Indexes for performance
+    __table_args__ = (
+        Index('idx_page_time', 'page', 'created_at'),
+        Index('idx_user_performance', 'user_id', 'created_at'),
+    )
+    
+    def __repr__(self):
+        return f"<PerformanceMetrics(page='{self.page}', load_time={self.load_time_ms}ms)>"
 
 
 # Database initialization function
